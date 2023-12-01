@@ -5,11 +5,11 @@ function getval(x)
     parseint("$(s[1])$(s[end])")
 end
 
-all = getval.(input)
-println(sum(all))
+alllines = getval.(input)
+println(sum(alllines))
 
 function getval2(txt)
-    pat = r"one|two|three|four|five|six|seven|eight|nine|[1234567890]"
+    pat = r"one|two|three|four|five|six|seven|eight|nine|[0-9]"
     words = [ match.match for match in eachmatch(pat, txt; overlap=true)]
     parser = Dict(
         "one"=>"1",
@@ -29,5 +29,5 @@ function getval2(txt)
     parseint("$(word1)$(word2)")
 end
 
-all = getval2.(input)
-println(sum(all))
+alllines = getval2.(input)
+println(sum(alllines))
