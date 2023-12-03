@@ -1,6 +1,6 @@
 include("utils.jl")
 
-input = readinput(true)
+input = readinput()
 
 function getgame(line)
     cubes = Dict("red"=>12, "green"=>13, "blue"=>14)
@@ -32,7 +32,7 @@ function getpower(line)
     for game in games
         counts = Dict("red"=>0, "green"=>0, "blue"=>0)
         each = split(game, ",")
-        for e in eachs
+        for e in each
             a, b = split(e)
             counts[b] += parseint(a)
         end
