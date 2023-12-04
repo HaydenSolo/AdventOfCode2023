@@ -32,9 +32,9 @@ function handlecardpart2(line)
 end
 
 function handlecards(lines)
-    copies = Dict()
+    copies = []
     for i in 1:length(lines)
-        copies[i] = 1
+        push!(copies, 1)
     end
     for i in 1:length(lines)
         for j in i+1:i+handlecardpart2(lines[i])
