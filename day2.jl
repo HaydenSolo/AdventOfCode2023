@@ -1,6 +1,6 @@
 include("utils.jl")
 
-input = readinput()
+input = readinput(true)
 
 function getgame(line)
     cubes = Dict("red"=>12, "green"=>13, "blue"=>14)

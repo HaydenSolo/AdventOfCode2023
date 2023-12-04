@@ -1,3 +1,5 @@
+include("utils.jl")
+
 input = readinput()
 
 function getval(x) 
