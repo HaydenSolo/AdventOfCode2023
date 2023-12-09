@@ -25,19 +25,23 @@ end
 println(findout(nodemap))
 
 function findoutghost(nodemap)
-    steps = 0
-    current = [x for x in keys(nodemap) if x[3] == 'A']
-    while true
-        for char in instructions
-            # println(current)
-            steps += 1
-            for (i, c) in enumerate(current)
-                current[i] = nodemap[c][char == 'L' ? 1 : 2]
+    starts = [x for x in keys(nodemap) if x[3] == 'A']
+    found = []
+    for start in starts
+        steps = 0
+        current = start
+        flen = length(found)
+        while true
+            for char in instructions
+                steps += 1
+                current = nodemap[current][char == 'L' ? 1 : 2]
+                current[3] == 'Z' && push!(found, steps)
             end
-            ends = filter(x -> x[3] == 'Z', current)
-            current == ends && (return steps)
+            length(found) > flen && break
         end
     end
+    println(found)
+    return lcm(found...)
 end
 
 println(findoutghost(nodemap))
