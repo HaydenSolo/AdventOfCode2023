@@ -112,48 +112,7 @@ end
 
 move(from::CartesianIndex, dir::LEFT) = from + CartesianIndex(0, -1)
 
-# function getinclusion(loc, maze, labels)
-#     inside = 1 < loc[1] < size(maze)[1] && 1 < loc[2] < size(maze)[2]
-#     if !inside
-#         labels[loc] = -1
-#         return
-#     end
-#     labels[loc] = 0
-#     valid = 1
-#     for direction in (LEFT(), RIGHT(), UP(), DOWN())
-#         newloc = move(loc, direction)
-#         if !(newloc in keys(labels))
-#             getinclusion(newloc, maze, labels)
-#         end
-#         if labels[newloc] == -1
-#             valid = -1
-#             break
-#         end
-#     end
-#     labels[loc] = valid
-# end
-
-# function getinclusion(start, maze)
-#     mazepieces = markmaze(start, maze)
-#     mazelabels = Dict{CartesianIndex{2}, Int}()
-#     for piece in mazepieces
-#         mazelabels[piece] = 1
-#     end
-#     while(length(mazelabels) != length(maze))
-#         # println(length([x for x in values(mazelabels) if x]))
-#         for i in 1:size(maze)[1]
-#             for j in 1:size(maze)[2]
-#                 loc = CartesianIndex(i, j)
-#                 loc in keys(mazelabels) || getinclusion(loc, maze, mazelabels)
-#             end
-#         end
-#     end
-#     return mazelabels
-#     # return length([x for x in values(mazelabels) if x == 1]) - length(mazepieces)
-# end
-
 function poisonr(loc, maze, poisoned)
-    # loc == CartesianIndex(8, 6) && println("HERE")
     checkbounds(Bool, maze, loc) || return
     loc in poisoned && return
     push!(poisoned, loc)
@@ -170,7 +129,6 @@ end
 function poison(start, maze)
     mazepieces = markmaze(start, maze)
     poisoned = Set{CartesianIndex{2}}(mazepieces)
-    # checked = Set{CartesianIndex{2}}(mazepieces)
     for i in 1:size(maze)[1]
         loc = CartesianIndex(i, 1)
         poisonr(loc, maze, poisoned)
@@ -187,7 +145,6 @@ function poison(start, maze)
         loc = CartesianIndex(1, i)
         poisonr(loc, maze, poisoned)
     end
-    # return length(maze) - length(poisoned)
     return poisoned
 end
 
@@ -196,10 +153,7 @@ function tryslip(corner, structure, corners, c, poisoned)
     up = CartesianIndex(corner[1]-1, corner[2])
     if checkbounds(Bool, c, up) && !(up in corners)
         between = ((corner[1], corner[2]), (corner[1], corner[2]+1))
-        # println("up $between, $(between in structure)")
-        # println(structure)
         if !(between in structure)
-            # up == test && println("Up $between")
             push!(corners, up)
             tryslip(up, structure, corners, c, poisoned)
             push!(poisoned, CartesianIndex(between[1]))
@@ -209,9 +163,7 @@ function tryslip(corner, structure, corners, c, poisoned)
     down = CartesianIndex(corner[1]+1, corner[2])
     if checkbounds(Bool, c, down) && !(down in corners)
         between = ((corner[1]+1, corner[2]), (corner[1]+1, corner[2]+1))
-        # println("down $between, $(between in structure)")
         if !(between in structure)
-            # down == test && println("Down $between $corner")
             push!(corners, down)
             tryslip(down, structure, corners, c, poisoned)
             push!(poisoned, CartesianIndex(between[1]))
@@ -221,9 +173,7 @@ function tryslip(corner, structure, corners, c, poisoned)
     left = CartesianIndex(corner[1], corner[2]-1)
     if checkbounds(Bool, c, left) && !(left in corners)
         between = ((corner[1], corner[2]), (corner[1]+1, corner[2]))
-        # println("left $between, $(between in structure)")
         if !(between in structure)
-            # left == test && println("Left $between")
             push!(corners, left)
             tryslip(left, structure, corners, c, poisoned)
             push!(poisoned, CartesianIndex(between[1]))
@@ -233,9 +183,7 @@ function tryslip(corner, structure, corners, c, poisoned)
     right = CartesianIndex(corner[1], corner[2]+1)
     if checkbounds(Bool, c, right) && !(right in corners)
         between = ((corner[1], corner[2]+1), (corner[1]+1, corner[2]+1))
-        # println("right $between, $(between in structure)")
         if !(between in structure)
-            # right == test && println("Right $between $corner")
             push!(corners, right)
             tryslip(right, structure, corners, c, poisoned)
             push!(poisoned, CartesianIndex(between[1]))
@@ -243,8 +191,6 @@ function tryslip(corner, structure, corners, c, poisoned)
         end
     end
 end
-
-        
 
 function poisonslip(start, maze)
     poisoned = poison(start, maze)
@@ -259,30 +205,14 @@ function poisonslip(start, maze)
         upright = (p[1]-1, p[2])
         downright = (p[1], p[2])
         for (a,b) in [upleft, downleft, upright, downright]
-            # checkbounds(Bool, corners, a, b) && (corners[a,b] = true)
             checkbounds(Bool, c, a, b) && push!(corners, CartesianIndex(a,b))
         end
     end
     startingcorners = copy(corners)
-    # println(length(poisoned))
     for corner in startingcorners
         tryslip(corner, structure, corners, c, poisoned)
     end
-    # println(length(poisoned))
-    # for corner in corners
-    #     push!(poisoned, corner)
-    #     push!(poisoned, CartesianIndex(corner[1]+1, corner[2]))
-    #     push!(poisoned, CartesianIndex(corner[1]+1, corner[2]+1))
-    #     push!(poisoned, CartesianIndex(corner[1], corner[2]+1))
-    # end
-    # return poisoned
     return length(maze) - length(poisoned)
 end
 
 println(poisonslip(start,maze))
-# poisoned = poison(start, maze)
-# pmaze = copy(maze)
-# for p in poisoned
-#     pmaze[p] = "P"
-# end
-# println(pmaze)
