@@ -5,23 +5,15 @@ using Combinatorics
 
 galaxy = String.(hcat(split.(readinput(), "")...))
 
-function doublerows(galaxy)
+function doublesel(galaxy, selector)
     double = Int[]
-    for (i, row) in enumerate(eachrow(galaxy))
+    for (i, row) in enumerate(selector(galaxy))
         all(isequal.(row, ".")) && push!(double, i)
     end
     return double
 end
 
-function doublecols(galaxy)
-    double = Int[]
-    for (i, col) in enumerate(eachcol(galaxy))
-        all(isequal.(col, ".")) && push!(double, i)
-    end
-    return double
-end
-
-rows, cols = doublerows(galaxy), doublecols(galaxy)
+rows, cols = doublesel(galaxy, eachrow), doublesel(galaxy, eachcol)
 planets = findall(isequal("#"), galaxy)
 pairs = collect(combinations(planets, 2))
 
