@@ -1,6 +1,6 @@
 include("utils.jl")
 
-input = split.(readinput(true))
+input = split.(readinput())
 
 function checkline(checking, info)
     matches = [length(match.match) for match in eachmatch(r"#+", checking)]
@@ -47,11 +47,15 @@ function getdamaged(line)
 end
 
 function main()
-total = 0
-for (i, line) in enumerate(input)
-    total += getdamaged(line)
-    println("Completed $i")
-end
-println(total)
+    open("answers.txt","w") do io
+        total = 0
+        for (i, line) in enumerate(input)
+            dam = getdamaged(line)
+            println(io, dam)
+            total += dam
+            println("Completed $i")
+        end
+        println(total)
+    end
 end
 main()
