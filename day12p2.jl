@@ -50,14 +50,43 @@ function buildstring(record, replacers; unknown=nothing)
     String(take!(io))
 end
 
+function recbuild(record, unknown, needed, answers, current, acc; io=Base.stdout, depth=1)
+    if length(current) == length(unknown)
+        checkline(buildstring(record, current; unknown=unknown), answers; finalpass=true) && push!(acc, current)
+        return
+    end
+    un = unknown[depth]
+    shortened = record[1:un]
+    remaining = unknown[depth+1:end]
+    for symbol in ("#", ".")
+        replacers = current * symbol
+        c = count(isequal('#'), replacers)
+        c > needed && continue
+        # println("With $replacers $c #, $(length(remaining)) remaining, $needed needed")
+        c + length(remaining) < needed && continue
+        newstring = buildstring(shortened, replacers; unknown=unknown)
+        checkline(newstring, answers) && recbuild(record, unknown, needed, answers, replacers, acc; io=io, depth=depth+1)
+    end
+end
+
+function buildanswersrec(record, info; io=Base.stdout)
+    unknown = findall(isequal('?'), record)
+    needed = sum(parseint(split(info, ","))) - count(==('#'), record)
+    answers = parseint(split(info, ","))
+    acc = []
+    recbuild(record, unknown, needed, answers, "", acc; io=io)
+    return length(acc)
+end
+
+
 function buildanswers(record, info; io=Base.stdout)
     unknown = findall(isequal('?'), record)
     needed = sum(parseint(split(info, ","))) - count(==('#'), record)
     answers = parseint(split(info, ","))
     level = [""]
-    print(io, "Need to find $(length(unknown)) values. ")
+    # print(io, "Need to find $(length(unknown)) values. ")
     for (i, un) in enumerate(unknown)
-        print(io, "Level $i: ")
+        # print(io, "Level $i: ")
         new = String[]
         shortened = record[1:un]
         remaining = unknown[i+1:end]
@@ -72,10 +101,10 @@ function buildanswers(record, info; io=Base.stdout)
                 checkline(newstring, answers) && push!(new, replacers)
             end
         end
-        print(io, "$(length(new)). ")
+        # print(io, "$(length(new)). ")
         level = new
     end
-    println(io)
+    # println(io)
     # println("Pre-final size of $(length(level))")
     final = [l for l in level if checkline(buildstring(record, l; unknown=unknown), answers; finalpass=true)]
     # println("Post-final size of $(length(final))")
@@ -96,7 +125,7 @@ function getdamaged(line; io=Base.stdout)
     record, info = line
     record = repeat(record*"?", 5)[1:end-1]
     info = repeat(info*",", 5)[1:end-1]
-    return buildanswers(record, info; io=io)
+    return buildanswersrec(record, info; io=io)
     # unknown = findall(isequal('?'), record)
     # needed = sum(parseint(split(info, ","))) - count(==('#'), record)
     # options = append!(['#' for _ in 1:length(unknown)], ['.' for _ in 1:length(unknown)])
@@ -142,6 +171,19 @@ function main(pos)
     end
 end
 
+function main()
+    total = 0
+    results = [0 for _ in 1:length(input)]
+    for (i, line) in enumerate(input)
+        dam = getdamaged(line)
+        # total += dam
+        results[i] = dam
+        println("Completed $i, added $dam")
+    end
+    # println(total)
+    println(sum(results))
+end
+# main()
 if abspath(PROGRAM_FILE) == @__FILE__
     length(ARGS) == 0 ? main(1) : main(parseint(ARGS[1]))
 end

@@ -18,3 +18,21 @@ function readmatrix(test::Bool=false)
     end
     flip
 end
+
+function tomat(vecs)
+    input = hcat(vecs...)
+end
+
+function flip(input::Matrix{T}) where T
+    flipped = similar(input, T, size(input)[2], size(input)[1])
+    for i in 1:size(input)[1]
+        for j in 1:size(input)[2]
+            flipped[j, i] = input[i, j]
+        end
+    end
+    flipped
+end
+function tomatflip(vecs)
+    input = tomat(vecs)
+    flip(input)
+end

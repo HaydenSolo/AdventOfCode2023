@@ -43,7 +43,6 @@ function getpower(line)
         end
     end
     pow = 1
-
     for val in values(mins)
         pow *= val
     end
