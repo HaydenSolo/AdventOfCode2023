@@ -68,8 +68,6 @@ struct East <: Direction end
 
 function visit(square::Square, travelling::Direction)
     square.energized = true
-    # display(grid)
-    # sleep(1)
     travel(square, travelling)
 end
 visit(square::Off, travelling::Direction) = nothing
