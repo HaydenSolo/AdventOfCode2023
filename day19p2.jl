@@ -95,7 +95,6 @@ end
     
 function getcombinations(rule::Rule, range::Range, ruledict::Dict)
     observedrange = getrange(rule, range)
-    # println("\n$rule\n$range")
     if rule.gt
         observedrange[2] <= rule.val && (return 0, range)
         observedrange[1] > rule.val && (return getcombinations(range), nothing)
@@ -103,7 +102,6 @@ function getcombinations(rule::Rule, range::Range, ruledict::Dict)
         notmatching = (observedrange[1], rule.val)
         matchingrange = Range(range, rule, matching)
         notmatchingrange = Range(range, rule, notmatching)
-        # println("$matchingrange\n$notmatchingrange")
         return getcombinations(rule.result, matchingrange, ruledict), notmatchingrange
     else
         observedrange[1] >= rule.val && (return 0, range)
@@ -112,7 +110,6 @@ function getcombinations(rule::Rule, range::Range, ruledict::Dict)
         notmatching = (rule.val, observedrange[2])
         matchingrange = Range(range, rule, matching)
         notmatchingrange = Range(range, rule, notmatching)
-        # println("$matchingrange\n$notmatchingrange")
         return getcombinations(rule.result, matchingrange, ruledict), notmatchingrange
     end
 end
