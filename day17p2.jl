@@ -74,8 +74,9 @@ function neighbours(nodedir::NodeDir, maps::Dict{Node, Vector{NodeDir}})
     for (neighbour, dir) in [(node.up, Up()), (node.down, Down()), (node.left, Left()), (node.right, Right())]
         neighbour == nothing && continue
         opposing(nodedir.dir, dir) && continue
+        nodedir.straightlen < 4 && dir != nodedir.dir && continue
         newlength = dir == nodedir.dir ? nodedir.straightlen + 1 : 1
-        newlength == 4 && continue
+        newlength == 11 && continue
         all = maps[neighbour]
         for nd in all
             nd.dir == dir && nd.straightlen == newlength && (push!(ns, nd);break)
@@ -90,7 +91,7 @@ function findpath(grid, startnode, endnode)
     for node in grid
         maps[node] = NodeDir[]
         for dir in [Up(), Left(), Right(), Down()]
-            for n in 1:3
+            for n in 1:10
                 nd = NodeDir(node, dir, n)
                 push!(unvisited, nd)
                 push!(maps[node], nd)
@@ -99,12 +100,13 @@ function findpath(grid, startnode, endnode)
     end
     # tovisit = Set{NodeDir}()
     # push!(tovisit, NodeDir(startnode, Undefined(), 0))
-    push!(unvisited, NodeDir(startnode, Undefined(), 0, 0, nothing))
+    push!(unvisited, NodeDir(startnode, Right(), 0, 0, nothing))
+    push!(unvisited, NodeDir(startnode, Down(), 0, 0, nothing))
     # startnode.pathlength = 0
     # startnode.direction = Right()
     while true
         nextnode = minimumby(pathlength, unvisited)
-        nextnode.node == endnode && return(nextnode)
+        nextnode.node == endnode && nextnode.straightlen >= 4 && return(nextnode)
         for neighbour in neighbours(nextnode, maps)
             len = nextnode.pathlength + neighbour.node.value
             if len < neighbour.pathlength
@@ -142,5 +144,4 @@ end
 function test(input)
     grid = findpath(input)
     path = getpath(grid)
-    grid, path
 end
